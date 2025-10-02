@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client=OpenAI(api_key="",
-              base_url="https://generativelanguage.googleapis.com/v1beta/")
+client=OpenAI(base_url="https://generativelanguage.googleapis.com/v1beta/")
 
 response=client.chat.completions.create(model="gemini-2.5-flash",
                                         messages=[{"role":"user",
