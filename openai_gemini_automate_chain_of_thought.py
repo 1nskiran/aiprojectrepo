@@ -26,29 +26,35 @@ SYSTEM_PROMPT="""Your name is Jai. You should work in chain of thought manner.
                 PLAN:{"step":"PLAN":"content":"first search for while loop syntax in python and prepare sample code for while loop"}
                 OUTPUT: {"step":"OUTPUT":"content":"while i<5:\n    print(i)\n    i += 1"}
 """
-
+print("\n\n")
 message_history=[{"role":"system","content":SYSTEM_PROMPT}]
 
-user_query=input("Hi")
+user_query=input("Hi Jai")
 message_history.append({"role":"user","content":user_query})
-
+ 
 
 import json
-response=client.chat.completions.create(model="gemini-2.5-flash",
-                                        response_format={"type":"json_object"},
-                                        messages=[{"role":"system","content":SYSTEM_PROMPT},
-                                                  #step-1
-                                                  {"role":"user","content":"Hi Jai, whats the role of CEO in a company?"},
-                                                  #step-2:manually copy output that comes from step-1
-                                                  {"role":"assistant","content":json.dumps({
-                                                                                            "step": "START",
-                                                                                            "content": "Hi Jai, whats the role of CEO in a company?"
-                                                                                            })},
-                                                 #step-3:manually copy output that comes from step-2
-                                                 {"role":"assistant","content":json.dumps({
-                                                                                            "step": "PLAN",
-                                                                                            "content": "The user is asking about the role of a CEO. I will outline the primary responsibilities and functions of a CEO within a company. This will include strategic direction, leadership, decision-making, financial performance, and external representation."
-                                                                                            })}])
 
+while True: 
+    print()
+    response=client.chat.completions.create(model="gemini-2.5-flash", 
+                                            response_format={"type":"json_object"},
+                                            messages=message_history) 
+    print()
+    assistant_result=response.choices[0].message.content
+    message_history.append({"role":"assistant","content":assistant_result})
+    parsed_result=json.loads(assistant_result)
 
-print(response.choices[0].message.content)
+    if parsed_result.get("step") == "START":
+        print("Starting..",parsed_result.get("content"))
+        continue
+    
+    if parsed_result.get("step") == "PLAN":
+        print('Planning..',parsed_result.get("content"))
+        continue
+    
+    if parsed_result.get("step") == "OUTPUT":
+        print("Final output..",parsed_result.get("content"))
+        break
+
+print("\n\n")
